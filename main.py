@@ -7,7 +7,7 @@ import numpy as np
 import librosa
 import pandas as pd
 import matplotlib.pyplot as plt
-
+import streamlit as st
 # predict using melspectogram image
 
 
@@ -29,7 +29,22 @@ def predict_image(audio):
     pred = classes[np.argmax(model.predict([image]))]
     return pred
 
+def standart_scaler(data : pd.DataFrame): 
 
+    with open("./mean_std_data.txt") as file: 
+        arrays = np.array(file.readlines(), dtype = np.float32)
+        file.close()
+    print(st.text(arrays))
+    mean = [value for (index, value) in enumerate(arrays) if index % 2 != 0 ]
+    std  = [value for (index, value) in enumerate(arrays) if index % 2 ==  0 ]
+    print(st.text(len(mean)))
+    print(st.text(len(std)))
+
+    for iter, column in enumerate(data.columns): 
+        data.at[0, column] = np.round((data.loc[0, column] - mean[iter]) / std[iter], decimals = 5)
+
+    return data
+    
 # getting average and sum from feature extraction
 def get_value(array : np.array, action):
     array_flat = array.flatten()
@@ -107,15 +122,16 @@ def feature_extraction_tabular(input_audio):
         "sum spectral flattness" : array_sum_spectral_flattness, 
         "sum spectrall rolloff" : array_sum_spectral_rolloff, 
     }
-    return pd.DataFrame(dict_features_extraction)
+    
+    return standart_scaler(pd.DataFrame(dict_features_extraction))
 
 
-def display_tabular_data(data_audio):
-    print(feature_extraction_tabular(data_audio))
+# def display_tabular_data(data_audio):
+#     print(feature_extraction_tabular(data_audio))
 
 def predict_tabular(data_audio): 
     data_extraction = feature_extraction_tabular(data_audio)
-    pred_data = np.array([x for x in data_extraction[0 : 1 : len(data_extraction.columns)]])
+    pred_data = np.array([x for x in data_extraction.iloc[0 : 0:len(data_extraction.columns)]])
     model = tf.keras.models.load_model("./tabular_classfication.h5")
     tabular_pred = model.predict([pred_data])
     return tabular_pred
