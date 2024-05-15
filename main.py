@@ -139,7 +139,8 @@ def feature_extraction_tabular(input_audio):
 
 def predict_tabular(data_audio): 
     data_extraction = feature_extraction_tabular(data_audio)
-    pred_data = np.array([x for x in data_extraction.iloc[0 : 0:len(data_extraction.columns)]])
+    pred_data = np.expand_dims([x for x in data_extraction.iloc[0, :]],  axis = 0)
     model = tf.keras.models.load_model("./tabular_classfication.h5")
-    tabular_pred = model.predict([pred_data])
-    return tabular_pred
+    
+    tabular_pred = model.predict(pred_data)
+    return np.argmax(tabular_pred[0])
