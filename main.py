@@ -8,6 +8,7 @@ import librosa
 import pandas as pd
 import matplotlib.pyplot as plt
 import streamlit as st
+
 # predict using melspectogram image
 
 
@@ -19,11 +20,11 @@ def get_melspectogram(audio):
     img = librosa.display.specshow(mel, sr=sr)
     return img
 
-
 def predict_image(audio): 
     classes = [x for  x in os.listdir("./data/genres_original/")]
     model = tf.keras.models.load_model("./image_classfication.h5")
     mel = get_melspectogram(audio)
+
     raw = tf.io.read_file(image)
     image = tf.image.decode_png(raw, channels=3)
     pred = classes[np.argmax(model.predict([image]))]
@@ -138,9 +139,10 @@ def feature_extraction_tabular(input_audio):
 #     print(feature_extraction_tabular(data_audio))
 
 def predict_tabular(data_audio): 
+    classes = ['blue', "classical", "country", "disco", "hiphop", "jazz", "metal",  "pop", "reggae", "rock"]
     data_extraction = feature_extraction_tabular(data_audio)
     pred_data = np.expand_dims([x for x in data_extraction.iloc[0, :]],  axis = 0)
     model = tf.keras.models.load_model("./tabular_classfication.h5")
     
     tabular_pred = model.predict(pred_data)
-    return np.argmax(tabular_pred[0])
+    return {"prediction" : classes[np.argmax(tabular_pred[0])]}
