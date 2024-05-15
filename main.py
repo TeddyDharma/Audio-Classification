@@ -2,33 +2,9 @@
 
 
 import tensorflow as tf
-import os
 import numpy as np
 import librosa
 import pandas as pd
-import matplotlib.pyplot as plt
-import streamlit as st
-
-# predict using melspectogram image
-
-
-def get_melspectogram(audio): 
-    audio, sr  = librosa.load(audio)
-    mel = librosa.feature.melspectrogram(y=audio, sr=sr)
-    fig, ax = plt.subplots(facecolor='none')
-    S_dB = librosa.power_to_db(audio, ref=np.max)
-    img = librosa.display.specshow(mel, sr=sr)
-    return img
-
-def predict_image(audio): 
-    classes = [x for  x in os.listdir("./data/genres_original/")]
-    model = tf.keras.models.load_model("./image_classfication.h5")
-    mel = get_melspectogram(audio)
-
-    raw = tf.io.read_file(image)
-    image = tf.image.decode_png(raw, channels=3)
-    pred = classes[np.argmax(model.predict([image]))]
-    return pred
 
 def standart_scaler(data : pd.DataFrame): 
     arrays = []
