@@ -30,18 +30,26 @@ def predict_image(audio):
     return pred
 
 def standart_scaler(data : pd.DataFrame): 
-
+    arrays = []
     with open("./mean_std_data.txt") as file: 
-        arrays = np.array(file.readlines(), dtype = np.float32)
-        file.close()
-    print(st.text(arrays))
-    mean = [value for (index, value) in enumerate(arrays) if index % 2 != 0 ]
-    std  = [value for (index, value) in enumerate(arrays) if index % 2 ==  0 ]
-    print(st.text(len(mean)))
-    print(st.text(len(std)))
-
+        for line in file.readlines(): 
+            arrays.append(line.strip())
+    file.close()
+    
+    arrays = np.array(arrays, dtype = np.float32).flatten()
+    # print(f'arrays value : {arrays}')
+    std = [value for (index, value) in enumerate(arrays) if index % 2 != 0 ]
+    mean  = [value for (index, value) in enumerate(arrays) if index % 2 ==  0 ]
+    
     for iter, column in enumerate(data.columns): 
-        data.at[0, column] = np.round((data.loc[0, column] - mean[iter]) / std[iter], decimals = 5)
+        if mean[iter] > 1:
+            for row in range(data.shape[0]):
+                #  just get two digits number after "."
+                data.at[row, column] = np.round((data.loc[0, column]  -  mean[iter]) / std[iter],  decimals = 5)
+        else: 
+            for row in range(data.shape[0]): 
+                # print(f'ubah : {np.round(data.loc[row, column], decimals= 2)}')
+                data.at[row, column] =  np.round(data.loc[row, column], decimals= 5)
 
     return data
     
