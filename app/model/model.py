@@ -5,10 +5,14 @@ import tensorflow as tf
 import numpy as np
 import librosa
 import pandas as pd
+import json
+
+
+
 
 def standart_scaler(data : pd.DataFrame): 
     arrays = []
-    with open("./mean_std_data.txt") as file: 
+    with open("./model/mean_std_data.txt") as file: 
         for line in file.readlines(): 
             arrays.append(line.strip())
     file.close()
@@ -58,6 +62,7 @@ def feature_extraction_tabular(input_audio):
     array_sum_spectral_rolloff = []
     array_sum_spectral_flattness = []
     audio, sr  = librosa.load(input_audio)
+ 
     # chroma features
     array_avg_spectral_bandwidth.append(get_value(librosa.feature.spectral_bandwidth(y=audio, sr=sr), action="avg"))
     # zero crossing rate
@@ -115,10 +120,10 @@ def feature_extraction_tabular(input_audio):
 #     print(feature_extraction_tabular(data_audio))
 
 def predict_tabular(data_audio): 
-    classes = ['blue', "classical", "country", "disco", "hiphop", "jazz", "metal",  "pop", "reggae", "rock"]
+    classes = ['blues', "classical", "country", "disco", "hiphop", "jazz", "metal",  "pop", "reggae", "rock"]
     data_extraction = feature_extraction_tabular(data_audio)
     pred_data = np.expand_dims([x for x in data_extraction.iloc[0, :]],  axis = 0)
-    model = tf.keras.models.load_model("./tabular_classfication.h5")
+    model = tf.keras.models.load_model("./model/tabular_classfication.h5")
     
     tabular_pred = model.predict(pred_data)
-    return {"prediction" : classes[np.argmax(tabular_pred[0])]}
+    return json.dumps({"prediction" : classes[np.argmax(tabular_pred[0])]})
