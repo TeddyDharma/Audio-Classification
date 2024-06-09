@@ -1,4 +1,5 @@
 ﻿# Audio-Classification
 Tubes NLP course 
-- UI.py not finished yet
-- Need improvement on image classification
+- [ ] User Interface
+- [x] Local Integration Testing
+- [x] Improvement on CNN model
