@@ -1,8 +1,7 @@
 from fastapi import FastAPI
-import sys
-import os
-from model.model import predict_tabular
+from app.model.model import predict_tabular
 from pydantic import BaseModel
+import uvicorn
 
 app = FastAPI()
 
@@ -21,3 +20,8 @@ def home():
 def predict(payload: InputUser):
     prediction = predict_tabular(payload.value)
     return {"prediction": prediction}
+
+
+
+if __name__ == '__main__':
+    uvicorn.run(app, host='127.0.0.1', port=8000)
