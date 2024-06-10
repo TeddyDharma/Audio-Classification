@@ -6,7 +6,11 @@ import numpy as np
 import librosa
 import pandas as pd
 import json
+from pathlib import Path
 
+__version__ = "0.1.0"
+
+BASE_DIR = Path(__file__).resolve(strict=True).parent
 
 
 
@@ -121,9 +125,9 @@ def feature_extraction_tabular(input_audio):
 
 def predict_tabular(data_audio): 
     classes = ['blues', "classical", "country", "disco", "hiphop", "jazz", "metal",  "pop", "reggae", "rock"]
-    data_extraction = feature_extraction_tabular(data_audio)
-    pred_data = np.expand_dims([x for x in data_extraction.iloc[0, :]],  axis = 0)
+    # data_extraction = feature_extraction_tabular(data_audio)
+    # pred_data = np.expand_dims([x for x in data_extraction.iloc[0, :]],  axis = 0)
     model = tf.keras.models.load_model("./model/tabular_classfication.h5")
     
-    tabular_pred = model.predict(pred_data)
+    tabular_pred = model.predict(data_audio)
     return json.dumps({"prediction" : classes[np.argmax(tabular_pred[0])]})
